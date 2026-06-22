@@ -49,6 +49,13 @@ NUMERIC_COLUMNS = [
     "people_vaccinated",
     "people_fully_vaccinated",
 ]
+CUMULATIVE_COLUMNS = [
+    "total_cases",
+    "total_deaths",
+    "population",
+    "people_vaccinated",
+    "people_fully_vaccinated",
+]
 
 
 def connection_parameters() -> dict:
@@ -105,6 +112,8 @@ def prepare_downloaded_data() -> pd.DataFrame:
 
     df = df.dropna(subset=["location", "date"])
     df = df.sort_values(["location", "date"]).reset_index(drop=True)
+    df[CUMULATIVE_COLUMNS] = df.groupby("location")[CUMULATIVE_COLUMNS].ffill()
+    df["date"] = df["date"].dt.date
     df.columns = [column.upper() for column in df.columns]
     return df
 
